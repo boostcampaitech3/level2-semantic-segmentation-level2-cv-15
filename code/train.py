@@ -25,6 +25,9 @@ import numpy as np
 import pandas as pd
 import wandb
 
+from loss import create_criterion
+from optimizer import get_opt_sche
+
 def parse_args():
     parser = ArgumentParser()
 
@@ -34,8 +37,8 @@ def parse_args():
 
     parser.add_argument('--dataset_path', type=str, default="/opt/ml/input/data")
     parser.add_argument('--saved_dir', type=str, default = "/opt/ml/input/code/saved")
-    parser.add_argument('--train_name', type=str,default="train_2.json") 
-    parser.add_argument('--valid_name', type=str, default="valid_2.json")
+    parser.add_argument('--train_name', type=str,default="splited/train_0.json") 
+    parser.add_argument('--valid_name', type=str, default="splited/valid_0.json")
     parser.add_argument('--test_name', type=str, default="test.json")
  
     parser.add_argument('--project', type=str, default = "segmentation")
@@ -48,10 +51,14 @@ def parse_args():
     parser.add_argument('--model', type=str, default="fcn_resnet50")
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--num_epoch', type=int, default=20)
+    parser.add_argument('--criterion', type=str, default='cross_entropy', help='criterion type')
+    parser.add_argument("--optimizer", type=str, default="adam", help="optimizer type (default: adam)")
     parser.add_argument('--learning_rate', type=int, default=0.0001)
     parser.add_argument('--seed', type=int, default=21)
-    parser.add_argument('--optimizer', type=str, default = "Adam")
     parser.add_argument('--weight_decay', type=int, default = 1e-6)
+    parser.add_argument("--momentum", type=float, default=0.9, help="momentum (default: 0.9)" )
+
+    parser.add_argument('--exp_name', type=str)
     
     args = parser.parse_args()
 
@@ -59,7 +66,7 @@ def parse_args():
 
 def do_training(args):
     
-    exp_name = f"base_{args.optimizer}_{args.learning_rate}_{args.train_name[:-5]}"
+    exp_name =args.exp_name
     wandb.init(project=args.project, entity=args.entity, name = exp_name)
     
     train_path = args.dataset_path + '/' + args.train_name
@@ -83,10 +90,11 @@ def do_training(args):
         
         best_mIoU = 0
 
-        opt_module = getattr(import_module("torch.optim"), args.optimizer)
-        optimizer = opt_module(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
+        optimizer = get_opt_sche(args, model)
+        # opt_module = getattr(import_module("torch.optim"), args.optimizer)
+        # optimizer = opt_module(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
 
-        criterion = nn.CrossEntropyLoss()
+        criterion = create_criterion(args.criterion)
         
         for epoch in range(args.num_epoch):
             model.train()
