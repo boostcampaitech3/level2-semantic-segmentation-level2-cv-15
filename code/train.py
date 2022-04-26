@@ -30,7 +30,7 @@ def parse_args():
 
     # Conventional args
 
-    parser.add_argument('--inference', type=bool, default=True)
+    parser.add_argument('--inference', type=bool, default=False)
 
     parser.add_argument('--dataset_path', type=str, default="/opt/ml/input/data")
     parser.add_argument('--saved_dir', type=str, default = "/opt/ml/input/code/saved")
