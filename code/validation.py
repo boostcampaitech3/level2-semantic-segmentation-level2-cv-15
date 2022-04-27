@@ -64,10 +64,7 @@ def validation(epoch, model, data_loader, criterion, device, train_path, sorted_
                                     images[0, :, :, :],
                                     masks={
                                         "ground_truth": {
-                                            "mask_data": masks[0, :, :]
-                                            .detach()
-                                            .cpu()
-                                            .numpy(),
+                                            "mask_data": masks[0, :, :],
                                             "class_labels": class_labels,
                                         }
                                     }
