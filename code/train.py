@@ -34,7 +34,11 @@ def parse_args():
 
     # Conventional args
 
-    parser.add_argument('--inference', type=bool, default=False)
+    parser.add_argument('--copy_paste', action="store_true")
+    parser.add_argument('--copy_pct', type=float, default=0.5)
+    parser.add_argument('--copy_p', type=float, default=0.5)
+
+    parser.add_argument('--inference', action="store_true")
     parser.add_argument('--model_path', type=str)
 
     parser.add_argument('--dataset_path', type=str, default="/opt/ml/input/data")
