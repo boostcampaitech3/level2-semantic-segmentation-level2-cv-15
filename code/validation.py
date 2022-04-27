@@ -46,31 +46,24 @@ def validation(epoch, model, data_loader, criterion, device, train_path, sorted_
             masks = masks.detach().cpu().numpy()
             
             hist = add_hist(hist, masks, outputs, n_class=n_class)
-            if step % interval == 0: 
+            if step % interval == 0:
                     wandb.log(
                         {
-                            "visualize": [
-                                wandb.Image(
-                                    images[0, :, :, :],
-                                    masks={
-                                        "predictions":{
-                                            "mask_data": outputs[0, :, :],
-                                            "class_labels": class_labels,
-                                        }
-                                    }
-                                ),
-
-                                wandb.Image(
-                                    images[0, :, :, :],
-                                    masks={
-                                        "ground_truth": {
-                                            "mask_data": masks[0, :, :],
-                                            "class_labels": class_labels,
-                                        }
-                                    }
-                                )
-                            ]
-                        })
+                            "visualize": wandb.Image(
+                                images[0, :, :, :],
+                                masks={
+                                    "predictions": {
+                                        "mask_data": outputs[0, :, :],
+                                        "class_labels": class_labels,
+                                    },
+                                    "ground_truth": {
+                                        "mask_data": masks[0, :, :],
+                                        "class_labels": class_labels,
+                                    },
+                                },
+                            )
+                        }
+                    )
         acc, acc_cls, mIoU, fwavacc, IoU = label_accuracy_score(hist)
         IoU_by_class = [{classes : round(IoU,4)} for IoU, classes in zip(IoU , sorted_df['Categories'])]
         
