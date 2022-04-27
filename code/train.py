@@ -69,6 +69,7 @@ def parse_args():
     parser.add_argument("--gamma", type=float, default=0.1, help="stepLR gamma (default: 0.1)")
 
     parser.add_argument('--exp_name', type=str)
+    parser.add_argument("--vis_every", type=int, default=10, help="image logging interval")
     
     args = parser.parse_args()
 
@@ -138,7 +139,7 @@ def do_training(args):
                             Loss: {round(loss.item(),4)}, mIoU: {round(mIoU,4)}')
                     wandb.log({"train/loss": round(loss.item(),4)})
             
-            pre_mIoU = validation(epoch + 1, model, val_loader, criterion, device, train_path, sorted_df)
+            pre_mIoU = validation(epoch + 1, model, val_loader, criterion, device, train_path, sorted_df, args.vis_every)
             # avrg_loss = validation(epoch + 1, model, val_loader, criterion, device)
             
             if pre_mIoU > best_mIoU:
@@ -189,4 +190,5 @@ def main(args):
 
 if __name__ == '__main__':
     args = parse_args()
+    print(args)
     main(args)

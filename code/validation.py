@@ -4,8 +4,20 @@ from utils import label_accuracy_score, add_hist, sort_class
 import wandb
 from tqdm import tqdm
 
-
-def validation(epoch, model, data_loader, criterion, device, train_path, sorted_df):
+class_labels = {
+    0: "Backgroud",
+    1: "General trash",
+    2: "Paper",
+    3: "Paper pack",
+    4: "Metal",
+    5: "Glass",
+    6: "Plastic",
+    7: "Styrofoam",
+    8: "Plastic bag",
+    9: "Battery",
+    10: "Clothing",
+}
+def validation(epoch, model, data_loader, criterion, device, train_path, sorted_df, interval):
     print(f'Start validation #{epoch}')
     model.eval()
 
@@ -34,7 +46,34 @@ def validation(epoch, model, data_loader, criterion, device, train_path, sorted_
             masks = masks.detach().cpu().numpy()
             
             hist = add_hist(hist, masks, outputs, n_class=n_class)
-        
+            if step % interval == 0: 
+                    wandb.log(
+                        {
+                            "visualize": [
+                                wandb.Image(
+                                    images[0, :, :, :],
+                                    masks={
+                                        "predictions":{
+                                            "mask_data": outputs[0, :, :],
+                                            "class_labels": class_labels,
+                                        }
+                                    }
+                                ),
+
+                                wandb.Image(
+                                    images[0, :, :, :],
+                                    masks={
+                                        "ground_truth": {
+                                            "mask_data": masks[0, :, :]
+                                            .detach()
+                                            .cpu()
+                                            .numpy(),
+                                            "class_labels": class_labels,
+                                        }
+                                    }
+                                )
+                            ]
+                        })
         acc, acc_cls, mIoU, fwavacc, IoU = label_accuracy_score(hist)
         IoU_by_class = [{classes : round(IoU,4)} for IoU, classes in zip(IoU , sorted_df['Categories'])]
         
