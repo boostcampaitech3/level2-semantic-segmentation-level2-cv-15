@@ -23,10 +23,19 @@ class FocalLoss(nn.Module):
         else:
             return self.FL(pred, target)
 
+class DiceLoss(nn.Module):
+
+    def __init__(self):
+        super().__init__()
+        self.DL = smp.losses.DiceLoss(mode = "multiclass")
+    
+    def forward(self, pred, target):
+        return self.DL(pred, target)
 
 _criterion_entrypoints = {
     'cross_entropy': nn.CrossEntropyLoss,
-    'focal': FocalLoss
+    'focal': FocalLoss,
+    'dice' : DiceLoss
 }
 
 def criterion_entrypoint(criterion_name):

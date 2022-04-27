@@ -100,6 +100,7 @@ def do_training(args):
         best_mIoU = 0
 
         criterion = create_criterion(args.criterion)
+        print(criterion)
         optimizer = create_optimizer(args, model)
         scheduler = create_scheduler(args, optimizer)
         
@@ -146,7 +147,7 @@ def do_training(args):
                 print(f"Save model in {args.saved_dir}")
                 best_mIoU = pre_mIoU
                 save_model(model, args.saved_dir, exp_name)
-        scheduler.step()
+        # scheduler.step()
         return
     
     # sample_submisson.csv 열기
