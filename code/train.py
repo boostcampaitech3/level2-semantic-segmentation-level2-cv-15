@@ -51,9 +51,9 @@ def parse_args():
     parser.add_argument('--print_step', type=int, default = 25)
     parser.add_argument('--seed', type=int, default=21)
 
-    parser.add_argument('--model', type=str, default="fcn_resnet50")
+    parser.add_argument('--model', type=str, default="deeplabv3_mobilenet_v3_large")
     parser.add_argument('--batch_size', type=int, default=16)
-    parser.add_argument('--num_epoch', type=int, default=20)
+    parser.add_argument('--num_epoch', type=int, default=15)
     parser.add_argument('--criterion', type=str, default='cross_entropy', help='criterion type')
 
     parser.add_argument("--optimizer", type=str, default="adam", help="optimizer type (default: adam)")
