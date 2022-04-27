@@ -35,6 +35,7 @@ def parse_args():
     # Conventional args
 
     parser.add_argument('--inference', type=bool, default=False)
+    parser.add_argument('--model_path', type=str)
 
     parser.add_argument('--dataset_path', type=str, default="/opt/ml/input/data")
     parser.add_argument('--saved_dir', type=str, default = "/opt/ml/input/code/saved")
@@ -76,23 +77,21 @@ def parse_args():
 def do_training(args):
     
     exp_name =args.exp_name
-    wandb.init(project=args.project, entity=args.entity, name = exp_name)
     
     train_path = args.dataset_path + '/' + args.train_name
     val_path = args.dataset_path + '/' + args.valid_name
     test_path = args.dataset_path + '/' + args.test_name
     device = args.device
-    sorted_df = sort_class(train_path)
+    sorted_df = sort_class()
 
     if not args.inference:
+        wandb.init(project=args.project, entity=args.entity, name = exp_name)
+
         train_dataset = CustomDataLoader(dataset_path = args.dataset_path, data_dir=train_path, mode='train', transform=get_train_transform(args), sorted_df = sorted_df)
         train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4, collate_fn=collate_fn)
 
         val_dataset = CustomDataLoader(dataset_path = args.dataset_path, data_dir=val_path, mode='val', transform=get_valid_transform(args), sorted_df = sorted_df)
         val_loader = torch.utils.data.DataLoader(dataset=val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, collate_fn=collate_fn)
-
-        test_dataset = CustomDataLoader(dataset_path = args.dataset_path, data_dir=test_path, mode='test', transform=get_test_transform(args), sorted_df = sorted_df)
-        test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=args.batch_size, num_workers=4, collate_fn=collate_fn)
         
         model = load_model(args.model, args.num_classes)
         wandb.watch(model)
@@ -149,7 +148,25 @@ def do_training(args):
                 save_model(model, args.saved_dir, exp_name)
         # scheduler.step()
         return
-    
+
+    #### INFERENCE ####
+
+    # test dataset loading
+    test_dataset = CustomDataLoader(dataset_path = args.dataset_path, data_dir=test_path, mode='test', transform=get_test_transform(args), sorted_df = sorted_df)
+    test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=args.batch_size, num_workers=4, collate_fn=collate_fn)
+
+    # best model 저장 경러
+    model_path = args.model_path
+
+    # best model 불러오기
+    model = load_model(args.model, args.num_classes)
+    checkpoint = torch.load(model_path, map_location=device)
+    state_dict = checkpoint.state_dict()
+    model.load_state_dict(state_dict)
+
+    model = model.to(device)
+    model.classifier[-1].out_channels = args.num_classes
+
     # sample_submisson.csv 열기
     submission = pd.read_csv(f'/opt/ml/input/code/submission/sample_submission.csv', index_col=None)
 

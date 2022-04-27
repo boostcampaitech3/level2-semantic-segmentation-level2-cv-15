@@ -72,7 +72,9 @@ def set_seed(args) :
 def collate_fn(batch):
     return tuple(zip(*batch))
 
-def sort_class(anns_file_path):
+def sort_class():
+
+    anns_file_path = "/opt/ml/input/data/train_all.json"
 
     # Read annotations
     with open(anns_file_path, 'r') as f:
