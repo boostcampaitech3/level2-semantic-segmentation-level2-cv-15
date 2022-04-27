@@ -11,7 +11,6 @@ def get_train_transform(args):
     else:
         return A.Compose([
                     CopyPaste(args, blend=False, sigma=1, pct_objects_paste=args.copy_pct, p=args.copy_p), #pct_objects_paste is a guess
-                    ToTensorV2()
                 ], bbox_params=A.BboxParams(format="coco", min_visibility=0.05)
             )
 

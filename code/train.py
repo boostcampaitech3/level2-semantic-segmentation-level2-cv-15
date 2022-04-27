@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 from model import load_model
 from utils import collate_fn, save_model, label_accuracy_score, add_hist, set_seed, sort_class
 from augmentation import get_test_transform, get_train_transform, get_valid_transform
-from dataset import CustomDataLoader
+from dataset import CustomDataLoader, CustomCPDataLoader
 from validation import validation
 from test import test
 
@@ -89,10 +89,28 @@ def do_training(args):
     device = args.device
     sorted_df = sort_class()
 
-    if not args.inference:
-        wandb.init(project=args.project, entity=args.entity, name = exp_name)
+    class_labels = {
+        0: "Backgroud",
+        1: "General trash",
+        2: "Paper",
+        3: "Paper pack",
+        4: "Metal",
+        5: "Glass",
+        6: "Plastic",
+        7: "Styrofoam",
+        8: "Plastic bag",
+        9: "Battery",
+        10: "Clothing",
+    }
 
+    if not args.inference:
+        # wandb.init(project=args.project, entity=args.entity, name = exp_name)
+
+        
         train_dataset = CustomDataLoader(dataset_path = args.dataset_path, data_dir=train_path, mode='train', transform=get_train_transform(args), sorted_df = sorted_df)
+        if args.copy_paste:
+            train_dataset = CustomCPDataLoader(dataset_path = args.dataset_path, data_dir=train_path, mode='train', transforms=get_train_transform(args), sorted_df = sorted_df)
+
         train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4, collate_fn=collate_fn)
 
         val_dataset = CustomDataLoader(dataset_path = args.dataset_path, data_dir=val_path, mode='val', transform=get_valid_transform(args), sorted_df = sorted_df)
@@ -133,6 +151,24 @@ def do_training(args):
 
                 outputs = torch.argmax(outputs, dim=1).detach().cpu().numpy()
                 masks = masks.detach().cpu().numpy()
+
+                wandb.log(
+                        {
+                            "visualize": wandb.Image(
+                                images[0, :, :, :],
+                                masks={
+                                    "predictions": {
+                                        "mask_data": outputs[0, :, :],
+                                        "class_labels": class_labels,
+                                    },
+                                    "ground_truth": {
+                                        "mask_data": masks[0, :, :],
+                                        "class_labels": class_labels,
+                                    },
+                                },
+                            )
+                        }
+                    )
                 
                 hist = add_hist(hist, masks, outputs, n_class=args.num_classes)
                 acc, acc_cls, mIoU, fwavacc, IoU = label_accuracy_score(hist)

@@ -304,15 +304,15 @@ def copy_paste_class(dataset_class):
         img_data = self.load_example(idx)
         ## 또다른 이미지 찾기
         if self.copy_paste is not None:
-            with open("/opt/ml/input/data/splited/train_0.json") as f:
-                data = json.load(f)
-            battery = []
-            for ann in data['annotations']:
-                if ann["category_id"] == 9:
-                    battery.append(ann["image_id"])
-            battery = list(set(battery))
-            battery = [832, 833, 810, 876, 753, 85, 823, 824]
-            paste_idx = battery[random.randint(0, len(battery))]
+            # with open("/opt/ml/input/data/splited/train_0.json") as f:
+            #     data = json.load(f)
+            # battery = []
+            # for ann in data['annotations']:
+            #     if ann["category_id"] == 9:
+            #         battery.append(ann["image_id"])
+            # battery = list(set(battery))
+            battery = [1696,2497,677,135,136,2536,138,110,2766,752,2640,2547,660,213,2548,2041,125]
+            paste_idx = battery[random.randint(0, len(battery)-1)]
             paste_img_data = self.load_example(paste_idx)
             for k in list(paste_img_data.keys()):
                 paste_img_data['paste_' + k] = paste_img_data[k]

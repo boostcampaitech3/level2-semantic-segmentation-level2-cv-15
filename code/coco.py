@@ -58,7 +58,6 @@ class CocoDetectionCP(CocoDetection):
         target = self.coco.loadAnns(ann_ids)
 
         path = self.coco.loadImgs(img_id)[0]['file_name']
-        print("path :", path)
         image = cv2.imread(os.path.join(self.root, path))
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
@@ -76,5 +75,4 @@ class CocoDetectionCP(CocoDetection):
             'masks': masks,
             'bboxes': bboxes
         }
-        print("pick first")
         return self.transforms(**output)
