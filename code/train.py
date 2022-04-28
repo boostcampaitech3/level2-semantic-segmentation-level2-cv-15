@@ -104,7 +104,7 @@ def do_training(args):
     }
 
     if not args.inference:
-        # wandb.init(project=args.project, entity=args.entity, name = exp_name)
+        wandb.init(project=args.project, entity=args.entity, name = exp_name)
 
         
         train_dataset = CustomDataLoader(dataset_path = args.dataset_path, data_dir=train_path, mode='train', transform=get_train_transform(args), sorted_df = sorted_df)
@@ -151,24 +151,6 @@ def do_training(args):
 
                 outputs = torch.argmax(outputs, dim=1).detach().cpu().numpy()
                 masks = masks.detach().cpu().numpy()
-
-                wandb.log(
-                        {
-                            "visualize": wandb.Image(
-                                images[0, :, :, :],
-                                masks={
-                                    "predictions": {
-                                        "mask_data": outputs[0, :, :],
-                                        "class_labels": class_labels,
-                                    },
-                                    "ground_truth": {
-                                        "mask_data": masks[0, :, :],
-                                        "class_labels": class_labels,
-                                    },
-                                },
-                            )
-                        }
-                    )
                 
                 hist = add_hist(hist, masks, outputs, n_class=args.num_classes)
                 acc, acc_cls, mIoU, fwavacc, IoU = label_accuracy_score(hist)

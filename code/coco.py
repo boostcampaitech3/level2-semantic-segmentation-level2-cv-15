@@ -69,6 +69,8 @@ class CocoDetectionCP(CocoDetection):
             masks.append(self.coco.annToMask(obj))
             bboxes.append(obj['bbox'] + [obj['category_id']] + [ix])
 
+        # print("Now bboxes :", len(bboxes))
+
         #pack outputs into a dict
         output = {
             'image': image,

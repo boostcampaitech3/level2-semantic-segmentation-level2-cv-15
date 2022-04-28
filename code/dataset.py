@@ -34,7 +34,7 @@ class CustomDataLoader(Dataset):
         images = cv2.imread(os.path.join(self.dataset_path, image_infos['file_name']))
         images = cv2.cvtColor(images, cv2.COLOR_BGR2RGB).astype(np.float32)
         images /= 255.0
-        
+
         if (self.mode in ('train', 'val')):
             ann_ids = self.coco.getAnnIds(imgIds=image_infos['id'])
             anns = self.coco.loadAnns(ann_ids)
@@ -91,15 +91,17 @@ class CustomCPDataLoader(Dataset):
                             self.data_dir, 
                             self.transforms
                         )
+        print("dataset init")
         
     def __getitem__(self, index: int):
+        tmp_data = self.data[index]
 
         # dataset이 index되어 list처럼 동작
         image_id = self.coco.getImgIds(imgIds=index)
         image_infos = self.coco.loadImgs(image_id)[0]
         
         # cv2 를 활용하여 image 불러오기
-        images = self.data[index]["image"].astype(np.float32)
+        images = tmp_data["image"].astype(np.float32)
         images /= 255.0
         
         if (self.mode in ('train', 'val')):
@@ -110,11 +112,11 @@ class CustomCPDataLoader(Dataset):
             cat_ids = self.coco.getCatIds()
             cats = self.coco.loadCats(cat_ids)
 
-            mask = self.data[index]["masks"]
-            bboxes = self.data[index]['bboxes']
+            bboxes = tmp_data['bboxes']
             box_classes = np.array([b[-2] for b in bboxes])
+            mask_indices = np.array([b[-1] for b in bboxes])
+            mask = np.array(tmp_data["masks"])[mask_indices]
             area = [np.sum(m) for m in mask]
-            print(len(mask) == len(area))
             big_idx = np.argsort(area)[::-1]
             # masks : size가 (height x width)인 2D
             # 각각의 pixel 값에는 "category id" 할당
@@ -123,7 +125,7 @@ class CustomCPDataLoader(Dataset):
             # General trash = 1, ... , Cigarette = 10
             for i in big_idx:
                 masks[mask[i] == 1] = box_classes[i]
-                print(len(mask), len(box_classes))
+                # print(len(mask), len(box_classes))
             masks = masks.astype(np.int8)
 
             bboxes = []
