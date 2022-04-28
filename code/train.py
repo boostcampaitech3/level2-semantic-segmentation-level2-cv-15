@@ -37,14 +37,16 @@ def parse_args():
     parser.add_argument('--copy_paste', action="store_true")
     parser.add_argument('--copy_pct', type=float, default=0.5)
     parser.add_argument('--copy_p', type=float, default=0.5)
+    parser.add_argument('--aug_c', type=int)
+    parser.add_argument('--aug_g', type=int)
 
     parser.add_argument('--inference', action="store_true")
-    parser.add_argument('--model_path', type=str)
+    parser.add_argument('--model_path', type=str, default = "/opt/ml/input/code/saved/base_4_cp.pt")
 
     parser.add_argument('--dataset_path', type=str, default="/opt/ml/input/data")
     parser.add_argument('--saved_dir', type=str, default = "/opt/ml/input/code/saved")
-    parser.add_argument('--train_name', type=str,default="splited/train_3.json") 
-    parser.add_argument('--valid_name', type=str, default="splited/valid_3.json")
+    parser.add_argument('--train_name', type=str,default="splited/train_2.json") 
+    parser.add_argument('--valid_name', type=str, default="splited/valid_2.json")
     parser.add_argument('--test_name', type=str, default="test.json")
  
     parser.add_argument('--project', type=str, default = "segmentation")
@@ -55,9 +57,9 @@ def parse_args():
     parser.add_argument('--print_step', type=int, default = 25)
     parser.add_argument('--seed', type=int, default=21)
 
-    parser.add_argument('--model', type=str, default="deeplabv3_mobilenet_v3_large")
+    parser.add_argument('--model', type=str, default="deeplabv3_resnet50")
     parser.add_argument('--batch_size', type=int, default=16)
-    parser.add_argument('--num_epoch', type=int, default=15)
+    parser.add_argument('--num_epoch', type=int, default=20)
     parser.add_argument('--criterion', type=str, default='cross_entropy', help='criterion type')
 
     parser.add_argument("--optimizer", type=str, default="adam", help="optimizer type (default: adam)")
@@ -73,7 +75,7 @@ def parse_args():
     parser.add_argument("--gamma", type=float, default=0.1, help="stepLR gamma (default: 0.1)")
 
     parser.add_argument('--exp_name', type=str)
-    parser.add_argument("--vis_every", type=int, default=10, help="image logging interval")
+    parser.add_argument("--vis_every", type=int, default=4, help="image logging interval")
     
     args = parser.parse_args()
 

@@ -54,12 +54,11 @@ class CocoDetectionCP(CocoDetection):
 
         with open(annFile) as f:
             data = json.load(f)
-        battery = []
+        cp_list = []
         for ann in data['annotations']:
-            if ann["category_id"] == 9:
-                battery.append(ann["image_id"])
-        battery = list(set(battery))
-        self.battery = battery
+            cp_list.append(ann["image_id"])
+        cp_list = list(set(cp_list))
+        self.cp_list = cp_list
 
     def load_example(self, index, new = False):
         img_id = self.ids[index]

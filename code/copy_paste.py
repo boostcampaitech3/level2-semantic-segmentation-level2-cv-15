@@ -304,8 +304,8 @@ def copy_paste_class(dataset_class):
         img_data = self.load_example(idx)
         ## 또다른 이미지 찾기
         if self.copy_paste is not None:
-            battery = self.battery
-            paste_idx = battery[random.randint(0, len(battery)-1)]
+            cp_list = self.cp_list
+            paste_idx = cp_list[random.randint(0, len(cp_list)-1)]
             paste_img_data = self.load_example(paste_idx)
             for k in list(paste_img_data.keys()):
                 paste_img_data['paste_' + k] = paste_img_data[k]
