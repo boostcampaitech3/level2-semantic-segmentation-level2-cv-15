@@ -304,13 +304,7 @@ def copy_paste_class(dataset_class):
         img_data = self.load_example(idx)
         ## 또다른 이미지 찾기
         if self.copy_paste is not None:
-            with open(self.annFile) as f:
-                data = json.load(f)
-            battery = []
-            for ann in data['annotations']:
-                if ann["category_id"] == 9:
-                    battery.append(ann["image_id"])
-            battery = list(set(battery))
+            battery = self.battery
             paste_idx = battery[random.randint(0, len(battery)-1)]
             paste_img_data = self.load_example(paste_idx)
             for k in list(paste_img_data.keys()):

@@ -3,7 +3,7 @@ import cv2
 from torchvision.datasets import CocoDetection
 from copy_paste import copy_paste_class
 import albumentations as A
-
+import json
 
 min_keypoints_per_image = 10
 
@@ -51,7 +51,16 @@ class CocoDetectionCP(CocoDetection):
             if has_valid_annotation(anno):
                 ids.append(img_id)
         self.ids = ids
-        self.annFile = annFile
+
+        with open(annFile) as f:
+            data = json.load(f)
+        battery = []
+        for ann in data['annotations']:
+            if ann["category_id"] == 9:
+                battery.append(ann["image_id"])
+        battery = list(set(battery))
+        self.battery = battery
+
     def load_example(self, index, new = False):
         img_id = self.ids[index]
         ann_ids = self.coco.getAnnIds(imgIds=img_id)
