@@ -43,8 +43,8 @@ def parse_args():
 
     parser.add_argument('--dataset_path', type=str, default="/opt/ml/input/data")
     parser.add_argument('--saved_dir', type=str, default = "/opt/ml/input/code/saved")
-    parser.add_argument('--train_name', type=str,default="splited/train_0.json") 
-    parser.add_argument('--valid_name', type=str, default="splited/valid_0.json")
+    parser.add_argument('--train_name', type=str,default="splited/train_3.json") 
+    parser.add_argument('--valid_name', type=str, default="splited/valid_3.json")
     parser.add_argument('--test_name', type=str, default="test.json")
  
     parser.add_argument('--project', type=str, default = "segmentation")
@@ -111,10 +111,10 @@ def do_training(args):
         if args.copy_paste:
             train_dataset = CustomCPDataLoader(dataset_path = args.dataset_path, data_dir=train_path, mode='train', transforms=get_train_transform(args), sorted_df = sorted_df)
 
-        train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4, collate_fn=collate_fn)
+        train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4, collate_fn=collate_fn, drop_last = True)
 
         val_dataset = CustomDataLoader(dataset_path = args.dataset_path, data_dir=val_path, mode='val', transform=get_valid_transform(args), sorted_df = sorted_df)
-        val_loader = torch.utils.data.DataLoader(dataset=val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, collate_fn=collate_fn)
+        val_loader = torch.utils.data.DataLoader(dataset=val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, collate_fn=collate_fn, drop_last = True)
         
         model = load_model(args.model, args.num_classes)
         wandb.watch(model)
@@ -168,7 +168,7 @@ def do_training(args):
                 print(f"Best performance at epoch: {epoch + 1}")
                 print(f"Save model in {args.saved_dir}")
                 best_mIoU = pre_mIoU
-                save_model(model, args.saved_dir, exp_name)
+                save_model(model, args.saved_dir, f"{exp_name}.pt")
         # scheduler.step()
         return
 
