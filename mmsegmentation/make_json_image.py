@@ -7,7 +7,7 @@ Set json_dir
 '''
 DATAROOT = "./"
 TRAINJSON = os.path.join(DATAROOT,"./train_all.json")  # 모든 데이터 들어있는 json 파일
-
+TESTJSON = os.path.join(DATAROOT,"./test.json")        # test 데이터 들어있는 json 파일
 '''
 Redistribution image by train/valid/test 
 rename img file name by img_id 
@@ -34,6 +34,7 @@ Main
 '''
 def __main__():
 	make(TRAINJSON, 'images')
+	make(TESTJSON, 'test')
 
 
 if __name__=='__main__':
