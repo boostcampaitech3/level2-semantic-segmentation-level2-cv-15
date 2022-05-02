@@ -33,9 +33,4 @@ def __main__():
 
 
 if __name__=='__main__':
-	__main__()JSON, 'images')
-	make(TESTJSON, 'test')
-
-
-if __name__=='__main__':
 	__main__()
