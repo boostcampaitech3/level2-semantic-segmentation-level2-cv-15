@@ -17,8 +17,8 @@ python -m ipykernel install --user --name mmseg
 3. PyTorch, Torchvision, mmcv 설치
 
 ```
-conda install pytorch=1.6.0 torchvision cudatoolkit=10.1 -c pytorch
-pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.6.0/index.html
+conda install pytorch=1.11 torchvision cudatoolkit=10.2 -c pytorch
+pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu102/torch1.11/index.html
 ```
 
 4. MMSegmentation 설치
@@ -26,7 +26,7 @@ pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.6
 ```
 git clone https://github.com/open-mmlab/mmsegmentation.git
 cd mmsegmentation
-python setup.py develop
+pip install -e .
 ```
 
 
