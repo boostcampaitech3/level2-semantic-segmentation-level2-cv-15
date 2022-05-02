@@ -10,7 +10,7 @@ conda activate mmseg
 
 2. JupyterLab에 가상환경 설치
 ```
-pip install ipykernel==6.0
+pip install ipykernel
 python -m ipykernel install --user --name mmseg
 ```
 
