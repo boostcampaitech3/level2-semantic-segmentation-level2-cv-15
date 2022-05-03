@@ -1,0 +1,19 @@
+img_size : 512
+data_root : '../'
+ann_file : '../splited/train_2_test.json'
+
+# -- RandomScale
+limit_min : 0.5
+limit_max : 1.
+rs_p : 1.
+
+# -- CopyPaste
+sigma : 1
+pct_objects_paste : 0.7
+cp_p : 0.2
+
+# -- save file name
+start_num : 0
+
+# -- which class
+cls_ids : [4, 5, 9, 10]
