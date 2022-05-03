@@ -39,7 +39,14 @@ python setup.py develop
 ```
 ├──input
 |   ├──data─┬──make_json_image.py
-|   |       └──make_json_mask.ipynb
+|   |       ├──make_json_mask.ipynb
+|   |       └──copy_paste
+|   |            ├──__init__.py
+|   |            ├──coco.py
+|   |            ├──copy_paste_main.py
+|   |            ├──copy_paste.py
+|   |            ├──save_inst.py
+|   |            └──cp_config.yaml
 |   └──mmseg               
 |       ├──images
 |       ├──annotations
@@ -70,3 +77,20 @@ python tools/train.py {config 파일 경로} --work-dir {work_dir 경로} --seed
 ```
 python tools/inference.py {config 파일 경로} {pth 파일 경로} --file_name {저장 될 csv 파일 이름}
 ```
+
+# Copy & Paste
+
+1. copy_paste 폴더로 이동
+
+2. cp_config.yaml의 복사하고 싶은 class를 cls_ids에 list형식으로 추가
+
+3. copy_paste_main.py를 아래와 같이 실행
+
+```
+python copy_paste_main.py --config {config 파일 경로}
+```
+
+4. input/mmseg/images와 input/mmseg/annotations에 다음과 같이 저장  
+ex) {추가한class}_{파일번호}.jpg,  {추가한class}_{파일번호}.png
+
+5. 복사하고 싶은 json파일은 cp_config.yaml에서 추가할 수 있고, input/mmseg에 json과 같은 파일명이 txt로 저장
