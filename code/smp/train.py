@@ -38,7 +38,6 @@ def myModel(seg_model, encoder_name='timm-efficientnet-b4' ):
 #                  classes=11,
                 
 #         encoder_weights='imagenet',
-        4
         encoder_name=encoder_name,
         encoder_depth=5, 
         # encoder_weights='imagenet', 
