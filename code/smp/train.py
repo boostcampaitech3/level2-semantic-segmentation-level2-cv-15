@@ -43,7 +43,7 @@ class SwinEncoder(torch.nn.Module, EncoderMixin):
         super().__init__()
 
         # A number of channels for each encoder feature tensor, list of integers
-        self._out_channels: List[int] = [128, 256, 512, 1024]
+        self._out_channels: List[int] = [192, 384, 768, 1536]
 
         # A number of stages in decoder (in other words number of downsampling operations), integer
         # use in in forward pass to reduce number of returning features
@@ -70,16 +70,16 @@ def register_encoder():
         "imagenet": {
             "mean": [0.485, 0.456, 0.406],
             "std": [0.229, 0.224, 0.225],
-            "url": "https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window12_384_22k.pth",
+            "url": "https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_large_patch4_window12_384_22kto1k.pth",
             "input_space": "RGB",
             "input_range": [0, 1],
         },
     },
     "params": { # 기본 파라미터
         "pretrain_img_size": 384,
-        "embed_dim": 128,
+        "embed_dim": 192,
         "depths": [2, 2, 18, 2],
-        'num_heads': [4, 8, 16, 32],
+        'num_heads': [6, 12, 24, 48],
         "window_size": 12,
         "drop_path_rate": 0.3,
     }
@@ -195,7 +195,7 @@ def train(data_dir, model_dir, args):
     )
 
     # -- model
-    model = myModel("PAN", "tu-resnest269e")
+    model = myModel("PAN", "swin_encoder")
     # model = myModel("PAN","timm-efficientnet-b1")
     # model = myModel("DeepLabV3Plus","timm-efficientnet-b4")
     # model = smp.UnetPlusPlus('timm-efficientnet-b4', encoder_depth=10)
@@ -354,20 +354,20 @@ if __name__ == "__main__":
         "--seed", type=int, default=21, help="random seed (default: 42)"
     )
     parser.add_argument(
-        "--epochs", type=int, default=40, help="number of epochs to train (default: 28)"
+        "--epochs", type=int, default=75, help="number of epochs to train (default: 28)"
     )
     parser.add_argument(
         "--batch_size",
         type=int,
-        default=12,
+        default=8,
         help="input batch size for training (default: 8)",
     )
     # parser.add_argument('--model', type=str, default='Unet3plus', help='model type (default: DeepLabV3Plus)')
     parser.add_argument(
-        "--lr", type=float, default=1e-5, help="learning rate (default: 5e-6)"
+        "--lr", type=float, default=5e-5, help="learning rate (default: 5e-6)"
     )
     parser.add_argument(
-        "--name", default="PA-swin-swa", help="model save at {SM_MODEL_DIR}/{name}"
+        "--name", default="PA_swin_large", help="model save at {SM_MODEL_DIR}/{name}"
     )
     parser.add_argument("--log_every", type=int, default=25, help="logging interval")
     parser.add_argument(
@@ -378,7 +378,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     wandb.init(project="segmentation", entity="boostcampaitech3")
-    wandb.run.name = "PA-tu-resnest269e"
+    wandb.run.name = "PA_swin_large"
     wandb.config.update(args)
     print(args)
 
