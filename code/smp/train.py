@@ -14,8 +14,8 @@ from adamp import AdamP
 from torch.optim.lr_scheduler import StepLR, CosineAnnealingLR
 
 from dataloader import *
-from gr_utils import *
-from gr_loss import *
+from utils import *
+from loss import *
 
 # from loss import create_criterion
 import torch
@@ -38,7 +38,7 @@ def myModel(seg_model, encoder_name='timm-efficientnet-b4' ):
 #                  classes=11,
                 
 #         encoder_weights='imagenet',
-        
+        4
         encoder_name=encoder_name,
         encoder_depth=5, 
         # encoder_weights='imagenet', 
