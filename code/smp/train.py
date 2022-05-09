@@ -29,8 +29,67 @@ import segmentation_models_pytorch as smp
 import torch 
 from importlib import import_module
 
+from swin import SwinTransformer
+from segmentation_models_pytorch.encoders._base import EncoderMixin
+from typing import List
+from torch.optim.swa_utils import AveragedModel, SWALR
 
-def myModel(seg_model, encoder_name='timm-efficientnet-b4' ):
+
+########## Swin 등록 ############
+# Custom SwinEncoder 정의
+class SwinEncoder(torch.nn.Module, EncoderMixin):
+
+    def __init__(self, **kwargs):
+        super().__init__()
+
+        # A number of channels for each encoder feature tensor, list of integers
+        self._out_channels: List[int] = [128, 256, 512, 1024]
+
+        # A number of stages in decoder (in other words number of downsampling operations), integer
+        # use in in forward pass to reduce number of returning features
+        self._depth: int = 3
+
+        # Default number of input channels in first Conv2d layer for encoder (usually 3)
+        self._in_channels: int = 3
+        kwargs.pop('depth')
+
+        self.model = SwinTransformer(**kwargs)
+
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
+        outs = self.model(x)
+        return list(outs)
+
+    def load_state_dict(self, state_dict, **kwargs):
+        self.model.load_state_dict(state_dict['model'], strict=False, **kwargs)
+
+# Swin을 smp의 encoder로 사용할 수 있게 등록
+def register_encoder():
+    smp.encoders.encoders["swin_encoder"] = {
+    "encoder": SwinEncoder, # encoder class here
+    "pretrained_settings": { # pretrained 값 설정
+        "imagenet": {
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "url": "https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window12_384_22k.pth",
+            "input_space": "RGB",
+            "input_range": [0, 1],
+        },
+    },
+    "params": { # 기본 파라미터
+        "pretrain_img_size": 384,
+        "embed_dim": 128,
+        "depths": [2, 2, 18, 2],
+        'num_heads': [4, 8, 16, 32],
+        "window_size": 12,
+        "drop_path_rate": 0.3,
+    }
+}
+################################
+
+def myModel(seg_model='PAN', encoder_name='swin_encoder' ):
+
+    register_encoder()
+
     smp_model =getattr(smp,seg_model)
     model =  smp_model(
 #                  # encoder_weights='noisy-student',
@@ -38,19 +97,21 @@ def myModel(seg_model, encoder_name='timm-efficientnet-b4' ):
 #                  classes=11,
                 
 #         encoder_weights='imagenet',
-        4
         encoder_name=encoder_name,
-        encoder_depth=5, 
+        # encoder_depth=5, 
         # encoder_weights='imagenet', 
-        encoder_weights='noisy-student',
-        decoder_use_batchnorm=True, 
+        encoder_weights='imagenet',
+        # decoder_use_batchnorm=True, 
         # decoder_channels=(256, 128, 64, 32, 16), 
-        decoder_channels=(512, 256, 64, 32, 16), 
-        decoder_attention_type=None, 
-        in_channels=3, 
-        classes=11, 
-        activation=None, 
-        aux_params=None
+        # decoder_channels=(512, 256, 64, 32, 16), 
+        # decoder_attention_type=None, 
+        # in_channels=3, 
+        # classes=11, 
+        # activation=None, 
+        # aux_params=None
+        encoder_output_stride = 32,
+        in_channels = 3,
+        classes =11
     )
     return model
 
@@ -82,8 +143,8 @@ def collate_fn(batch):
 
 def train(data_dir, model_dir, args):
     torch.backends.cudnn.benchmark = True
-    train_path = data_dir + "/train_2.json"
-    val_path = data_dir + "/valid_2.json"
+    train_path = data_dir + "/splited/train_2.json"
+    val_path = data_dir + "/splited/valid_2.json"
     seed_everything(args.seed)
     save_dir = "./" + increment_path(os.path.join(model_dir, args.name))
     os.makedirs(save_dir)
@@ -134,7 +195,8 @@ def train(data_dir, model_dir, args):
     )
 
     # -- model
-    model = myModel("UnetPlusPlus","timm-efficientnet-b1")
+    model = myModel("PAN", "tu-resnest269e")
+    # model = myModel("PAN","timm-efficientnet-b1")
     # model = myModel("DeepLabV3Plus","timm-efficientnet-b4")
     # model = smp.UnetPlusPlus('timm-efficientnet-b4', encoder_depth=10)
     model = model.to(device)
@@ -145,6 +207,13 @@ def train(data_dir, model_dir, args):
     optimizer = AdamP(model.parameters(), lr=args.lr, weight_decay=1e-3)
 
     scheduler = CosineAnnealingLR(optimizer, T_max=10, eta_min=1e-4)
+
+    ##### SWA ######
+    # swa_model = AveragedModel(model)
+    # swa_start = int(args.epochs / 100 * 70)
+    # swa_scheduler = SWALR(optimizer, anneal_strategy="linear", anneal_epochs=5, swa_lr=0.05)
+    ################
+
     class_labels = {
         0: "Backgroud",
         1: "General trash",
@@ -266,6 +335,14 @@ def train(data_dir, model_dir, args):
                 f"Validation #{epoch}  Average Loss: {round(avrg_loss.item(), 4)}, Accuracy : {round(acc, 4)}, mIoU: {round(mIoU, 4)}"
             )
             print(f"IoU by class : {IoU_by_class}")
+
+        ########## SWA ##########
+        # if epoch > swa_start:
+        #     swa_model.update_parameters(model)
+        #     swa_scheduler.step()
+        # else:
+        #     scheduler.step()
+        #########################
         scheduler.step()
         # val loop
 
@@ -277,12 +354,12 @@ if __name__ == "__main__":
         "--seed", type=int, default=21, help="random seed (default: 42)"
     )
     parser.add_argument(
-        "--epochs", type=int, default=25, help="number of epochs to train (default: 28)"
+        "--epochs", type=int, default=40, help="number of epochs to train (default: 28)"
     )
     parser.add_argument(
         "--batch_size",
         type=int,
-        default=8,
+        default=12,
         help="input batch size for training (default: 8)",
     )
     # parser.add_argument('--model', type=str, default='Unet3plus', help='model type (default: DeepLabV3Plus)')
@@ -290,7 +367,7 @@ if __name__ == "__main__":
         "--lr", type=float, default=1e-5, help="learning rate (default: 5e-6)"
     )
     parser.add_argument(
-        "--name", default="GR-timm-efficientnetb1-encoder-test1", help="model save at {SM_MODEL_DIR}/{name}"
+        "--name", default="PA-swin-swa", help="model save at {SM_MODEL_DIR}/{name}"
     )
     parser.add_argument("--log_every", type=int, default=25, help="logging interval")
     parser.add_argument(
@@ -301,7 +378,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     wandb.init(project="segmentation", entity="boostcampaitech3")
-    wandb.run.name = "GR-timm-efficientnetb1-encoder-test1"
+    wandb.run.name = "PA-tu-resnest269e"
     wandb.config.update(args)
     print(args)
 

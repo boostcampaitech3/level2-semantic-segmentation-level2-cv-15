@@ -11,8 +11,8 @@ import torch
 import json
 import glob
 
-dataset_path  = '../../input/data'
-anns_file_path = dataset_path + '/' + 'train_all.json'
+dataset_path  = '/opt/ml/input/data'
+anns_file_path = dataset_path + '/' + 'train_all3.json'
 
 # Read annotations
 with open(anns_file_path, 'r') as f:
