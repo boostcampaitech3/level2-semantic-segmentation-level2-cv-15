@@ -54,21 +54,21 @@ def parse_args():
     parser.add_argument('--model', type=str, default="deeplabv3_mobilenet_v3_large")
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--num_epoch', type=int, default=15)
-    parser.add_argument('--criterion', type=str, default='cross_entropy', help='criterion type')
+    parser.add_argument('--criterion', type=str, default='dicefocal', help='criterion type')
 
-    parser.add_argument("--optimizer", type=str, default="adam", help="optimizer type (default: adam)")
-    parser.add_argument('--learning_rate', type=int, default=0.0001)
+    parser.add_argument("--optimizer", type=str, default="adamw", help="optimizer type (default: adam)")
+    parser.add_argument('--learning_rate', type=int, default=0.0002)
     parser.add_argument('--weight_decay', type=int, default = 1e-6)
     parser.add_argument("--momentum", type=float, default=0.9, help="momentum (default: 0.9)" )
 
-    parser.add_argument("--scheduler", type=str, default="lambda", help="scheduler type (default: lambda)")
+    parser.add_argument("--scheduler", type=str, default="cosinerestart", help="scheduler type (default: lambda)")
     parser.add_argument("--poly_exp", type=float, default=1.0, help="polynomial LR exponent (default: 1.0)",)
     parser.add_argument("--T_max", type=int, default=10, help="cosineannealing T_max (default: 10)")
     parser.add_argument("--eta_min", type=int, default=0, help="cosineannealing eta_min (default: 0)")
     parser.add_argument("--step_size", type=int, default=10, help="stepLR step_size (default: 10)")
     parser.add_argument("--gamma", type=float, default=0.1, help="stepLR gamma (default: 0.1)")
 
-    parser.add_argument('--exp_name', type=str)
+    parser.add_argument('--exp_name', default = "smp_swinL_deeplabv3+",type=str)
     parser.add_argument("--vis_every", type=int, default=10, help="image logging interval")
     
     args = parser.parse_args()
@@ -100,7 +100,6 @@ def do_training(args):
         best_mIoU = 0
 
         criterion = create_criterion(args.criterion)
-        print(criterion)
         optimizer = create_optimizer(args, model)
         scheduler = create_scheduler(args, optimizer)
         
@@ -147,7 +146,7 @@ def do_training(args):
                 print(f"Save model in {args.saved_dir}")
                 best_mIoU = pre_mIoU
                 save_model(model, args.saved_dir, exp_name)
-        # scheduler.step()
+        scheduler.step()
         return
 
     #### INFERENCE ####

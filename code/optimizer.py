@@ -1,4 +1,5 @@
 import torch.optim as optim
+from adamp import AdamP
 
 def create_optimizer(args, model):
     """
@@ -26,7 +27,10 @@ def create_optimizer(args, model):
             lr=args.learning_rate,
             weight_decay=args.weight_decay,
         )
-    else:
+    elif args.optimizer == "adamp":
+        oprimizer = AdamP(model.parameters(), lr=args.lr, weight_decay=1e-3)
+
+    else:   
         raise ValueError("Not a valid optimizer")
 
     return optimizer

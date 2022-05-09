@@ -20,5 +20,8 @@ def create_scheduler(args, optimizer):
         )
     elif args.scheduler == "multistep":
         scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[30])
+    elif args.scheduler == "cosinerestart":
+         scheduler = lr_scheduler.CosineAnnealingWarmUpRestarts(
+            optimizer, T_0=1600, T_mult=1, eta_max=0.002, T_up =800, gamma = 0.5)
 
     return scheduler
