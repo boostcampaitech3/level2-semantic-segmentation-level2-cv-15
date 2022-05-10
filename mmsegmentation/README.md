@@ -94,3 +94,20 @@ python copy_paste_main.py --config {config 파일 경로}
 ex) {추가한class}_{파일번호}.jpg,  {추가한class}_{파일번호}.png
 
 5. 복사하고 싶은 json파일은 cp_config.yaml에서 추가할 수 있고, input/mmseg에 json과 같은 파일명이 txt로 저장
+
+
+# Soft voting ensemble
+#### 1. 코드 수정
+mmseg/models/segmentors/encoder_decoder.py의 코드를 다음과 같이 수정
+- TTA가 있을 경우 : aug_test 함수 내부 (284번 line)
+- TTA가 없을 경우 : simple_test 함수 내부 (261번 line)
+
+```
+seg_pred = seg_logit.argmax(dim=1)   # 원래 코드
+seg_pred = seg_logit                 # 수정 코드
+```
+
+#### 2. Inference
+```
+python tools/inference_soft.py {config 파일 경로} {pth 파일 경로} --file_name {저장 될 bin 파일 이름}
+```
