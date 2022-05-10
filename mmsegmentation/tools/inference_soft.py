@@ -61,6 +61,7 @@ def main(args):
 
     output = single_gpu_test(model, data_loader)
     output_pkl = np.stack(output, axis=0)
+    output_pkl = output_pkl * 255
     output_pkl = output_pkl.astype(np.uint8)
     with open(f"./output/{args.file_name}.bin", "wb") as f:
         
