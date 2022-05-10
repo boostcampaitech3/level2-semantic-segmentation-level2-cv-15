@@ -60,11 +60,13 @@ def main(args):
 
 
     output = single_gpu_test(model, data_loader)
-
+    output_pkl = np.stack(output, axis=0)
+    output_pkl = output_pkl.astype(np.uint8)
     with open(f"./output/{args.file_name}.bin", "wb") as f:
-        pickle.dump(output, f)
         
-    print("Done")
+        pickle.dump(output_pkl, f, protocol=4)
+        
+    print("\nDone")
 
 
     # # sample_submisson.csv 열기
