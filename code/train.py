@@ -29,6 +29,8 @@ from loss import create_criterion
 from optimizer import create_optimizer
 from scheduler import create_scheduler
 
+from mlflow import log_metric, log_param, log_artifacts, log_params
+
 def parse_args():
     parser = ArgumentParser()
 
@@ -61,7 +63,7 @@ def parse_args():
     parser.add_argument('--weight_decay', type=int, default = 1e-6)
     parser.add_argument("--momentum", type=float, default=0.9, help="momentum (default: 0.9)" )
 
-    parser.add_argument("--scheduler", type=str, default="cosinerestart", help="scheduler type (default: lambda)")
+    parser.add_argument("--scheduler", type=str, default="cosineanneal", help="scheduler type (default: lambda)")
     parser.add_argument("--poly_exp", type=float, default=1.0, help="polynomial LR exponent (default: 1.0)",)
     parser.add_argument("--T_max", type=int, default=10, help="cosineannealing T_max (default: 10)")
     parser.add_argument("--eta_min", type=int, default=0, help="cosineannealing eta_min (default: 0)")
@@ -70,6 +72,8 @@ def parse_args():
 
     parser.add_argument('--exp_name', default = "smp_swinL_deeplabv3+",type=str)
     parser.add_argument("--vis_every", type=int, default=10, help="image logging interval")
+
+    parser.add_argument("--mlflow", type=bool, default=False, help="logging metrics, parameters, models")
     
     args = parser.parse_args()
 
@@ -146,7 +150,10 @@ def do_training(args):
                 print(f"Save model in {args.saved_dir}")
                 best_mIoU = pre_mIoU
                 save_model(model, args.saved_dir, exp_name)
+
+
         scheduler.step()
+        log_artifacts(args.saved_dir)
         return
 
     #### INFERENCE ####
@@ -189,5 +196,7 @@ def main(args):
 
 if __name__ == '__main__':
     args = parse_args()
+    args_param = vars(args)
+    log_params(args_param)
     print(args)
     main(args)

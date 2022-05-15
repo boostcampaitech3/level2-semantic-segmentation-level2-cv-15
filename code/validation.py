@@ -4,6 +4,8 @@ from utils import label_accuracy_score, add_hist, sort_class
 import wandb
 from tqdm import tqdm
 
+from mlflow import log_metric, log_param, log_artifacts, log_params, log_metrics
+
 class_labels = {
     0: "Backgroud",
     1: "General trash",
@@ -80,6 +82,7 @@ def validation(epoch, model, data_loader, criterion, device, train_path, sorted_
             for cls in d:
                 log[f"val/{cls}_IoU"] = d[cls]
         wandb.log(log)
+        log_metrics(log)
         
     # return avrg_loss
     return round(mIoU, 4)
