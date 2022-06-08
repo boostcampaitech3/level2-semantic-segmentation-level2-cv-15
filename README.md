@@ -24,32 +24,32 @@
 - **프로젝트 구조**
 ```python
 .
-├──	📂 code
-│		├── 📂 smp
-│		├── 📝augmentation.py 
-│		├── 📝dataset.py  		
-│		├── 📝loss.py 
-│		├── 📝model.py 	
-│		│		     ⋮
+├── 📂 code
+│    ├── 📂 smp
+│    ├── 📝augmentation.py 
+│    ├── 📝dataset.py  		
+│    ├── 📝loss.py 
+│    ├── 📝model.py 	
+│    └──	⋮
 |      
 ├── 📂 mmsegmentation
-│		├── 📂 configs/
-│		├── 📂 copy_paste/
-│		├── 📂 loss/
-│		├── 📂 mmseg/core/optimizers
-│		├── 📂 tools/
-│		├── 📝 BaseSegmentor_val_visualize.py
-│		|        ⋮
+│    ├── 📂 configs/
+│    ├── 📂 copy_paste/
+│    ├── 📂 loss/
+│    ├── 📂 mmseg/core/optimizers
+│    ├── 📂 tools/
+│    ├── 📝 BaseSegmentor_val_visualize.py
+│    └──	⋮
 │				
 └── 📂 notebook
-		├── 📝 Visualization.ipynb
-	  ├── 📝 apply_crf.ipynb
-		├── 📝 make_peudo_label.ipynb
-    ├── 📝 hardvoting.ipynb
-    ├── 📝 make_json_mask.ipynb
-    ├── 📝 split_txt.ipynb
-    ├── 📝 softvoting.ipynb
-		└── 📝 test inference check.ipynb
+     ├── 📝 Visualization.ipynb
+     ├── 📝 apply_crf.ipynb
+     ├── 📝 make_peudo_label.ipynb
+     ├── 📝 hardvoting.ipynb
+     ├── 📝 make_json_mask.ipynb
+     ├── 📝 split_txt.ipynb
+     ├── 📝 softvoting.ipynb
+     └── 📝 test inference check.ipynb
 
 ```
 - **데이터 셋 구조**
