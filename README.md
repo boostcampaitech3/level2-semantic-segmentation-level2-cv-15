@@ -131,15 +131,11 @@
 
 ## Requirements
 
----
-
 ```jsx
 pip install -r requirements.txt
 ```
 
 # Train.py
-
----
 
 ```python
 # MMSeg
@@ -149,9 +145,7 @@ python tools/train.py {config 파일 경로} --work-dir {work_dir 경로} --seed
 python3 train.py --dir {custom 내 폴더이름}
 ```
 
-# Test.py
-
----
+# Inference.py
 
 ```python
 # MMSeg
