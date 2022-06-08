@@ -9,7 +9,7 @@
 | **석진혁** | mmsegmentation 실험, augmentation/optimizer 실험, copy&paste mmsegmentation |
 | **손정균** | mmsegmentation 실험, augmentation/optimizer 실험, pseudo-labeling 적용 |
 | **이현진** | pytorch baseline code 구성, copy paste augmentation, loss/optimizer/augmentation 실험 smp swin large model 구축 |
-
+| **임종현** | mmsegmentation 실험, loss function 실험 |
 ## Overview
 
 - 현재의 문화는 '쓰레기 대란', '매립지 부족'과 같은 여러 사회 문제를 낳고 있습니다. **분리수거**는 이러한 **환경 부담을 줄일 수 있는 방법** 중 하나입니다. 잘 분리배출 된 쓰레기는 자원으로서 가치를 인정받아 재활용되지만, **잘못 분리배출 되면 그대로 폐기물로 분류되어 매립 또는 소각**되기 때문입니다
