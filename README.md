@@ -119,7 +119,7 @@
 
 - 상위 5개의 제출 파일에 대해서 hard voting
 
-<div align="center"><img src="https://user-images.githubusercontent.com/57162812/172512045-b786ef0e-00ae-4528-8de3-5b25fc542659.png" width="80%"></div>
+<div align="center"><img src="https://user-images.githubusercontent.com/57162812/172512045-b786ef0e-00ae-4528-8de3-5b25fc542659.png" width="40%"></div>
 
 - `0.8071` : 6개 모델 hard voting + 특정 클래스에 가중치
     - **mmseg :** BEit + swin large, UperNet + beit pseudo, UperNet + BEit with 512 size+pseudo, Upernet +swin large, UperNet + swin base with pseudo
